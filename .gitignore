@@ -2,8 +2,6 @@
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
 # Binaries for programs and plugins
-*.exe
-*.exe~
 *.dll
 *.so
 *.dylib
@@ -12,7 +10,6 @@
 *.test
 
 # Code coverage profiles and other test artifacts
-*.out
 coverage.*
 !coverage.go
 *.coverprofile
@@ -29,5 +26,30 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Executable files and test results
+*.exe
+*.exe~
+*.test
+*.out
+coverage.*
+bin/
+dist/
+
+# secret files and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+
+# archive that don`t need to be seen in the repository
+reports/
+*.zip
+*.rar
