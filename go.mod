@@ -1,4 +1,4 @@
-module lab2
+module lab2_bubble
 
 go 1.27.0
 
