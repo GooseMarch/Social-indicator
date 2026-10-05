@@ -1,21 +1,21 @@
-package domain
+package main
 
-import("fmt"; "errors"; "github"; "github.com/compilyator/VNTU_GoLang/labs/Lab2Data/socialindicator")
+import("fmt"; "errors"; "github.com/compilyator/VNTU_GoLang/labs/Lab2Data/socialindicator")
 
-ErrarInvalidCount := errors.New("invalid count: must be between 5 and 100")
-ErrarinvalidCountry := errors.New("invalid country: must be something in this line.")
+var ErrarInvalidCount = errors.New("invalid count: must be between 5 and 100")
+var ErrarinvalidCountry = errors.New("invalid country: must be something in this line.")
 
 type Options struct {
 	Count int
 	Country string
-	Seed int64
+	Seed *int64
 }
 
 func (o Options) Validate() error {
 	if o.Count < 5 || o.Count > 100 {
 		return ErrarInvalidCount
 	}
-	else if o.Country == "" {
+	if o.Country == "" {
 		return ErrarinvalidCountry
 	}
 	return nil
@@ -40,7 +40,7 @@ func Analyze(o Options) (Result, error) {
 	var errar error
 
 	if o.Seed != nil {
-		values, errar = socialindicator.GenerateWithSeed(o.Count, o.Country, o.Seed)
+		values, errar = socialindicator.GenerateWithSeed(o.Count, o.Country, *o.Seed)
 	} else {
 		values, errar = socialindicator.Generate(o.Count, o.Country)
 	}
@@ -76,6 +76,5 @@ func Analyze(o Options) (Result, error) {
 		Max: maxVal,
 		Average: average,
 		Duplicate: CountsMap,
-	} 
-		return nil
+	}, nil
 	}
