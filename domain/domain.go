@@ -9,6 +9,7 @@ type Options struct {
 	Count int
 	Country string
 	Seed *int64
+	Extra bool
 }
 
 func (o Options) Validate() error {
@@ -28,6 +29,7 @@ type Result struct {
 	Max float64
 	Average float64
 	Duplicate map[float64]int
+	Extra int64
 }
 
 func Analyze(o Options) (Result, error) {
@@ -44,6 +46,7 @@ func Analyze(o Options) (Result, error) {
 	} else {
 		values, errar = socialindicator.Generate(o.Count, o.Country)
 	}
+	
 
 	if errar != nil {
 		return Result{}, fmt.Errorf("generation error: %v", errar)
@@ -69,6 +72,17 @@ func Analyze(o Options) (Result, error) {
 	}
 	var average float64 = sum / float64(len(values))
 
+	var Extra int64 = 0
+
+	
+	if o.Extra {
+			for _, v := range values{
+		if (average < v){
+			Extra++
+		}
+	}
+	}
+
 	return Result{
 		Country: o.Country,
 		Count: o.Count,
@@ -76,5 +90,6 @@ func Analyze(o Options) (Result, error) {
 		Max: maxVal,
 		Average: average,
 		Duplicate: CountsMap,
+		Extra: Extra,
 	}, nil
 	}
