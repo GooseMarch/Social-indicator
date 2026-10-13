@@ -36,6 +36,7 @@ func AnalyzeCLI(args []string) {
 	count := Flagset.Int("count", 0, "Number of values (5..100)")
 	country := Flagset.String("country", "", "Country name")
 	seed := Flagset.Int64("seed", -1, "Random seed (optional)")
+	extra := Flagset.Bool("extra", false , "Extra to do")
 
 	err := Flagset.Parse(args)
 	if err != nil {
@@ -46,10 +47,15 @@ func AnalyzeCLI(args []string) {
 	options := domain.Options{
 		Count:   *count,
 		Country: *country,
+		Extra: *extra,
 	}
 
 	if *seed != -1 {
 		options.Seed = seed
+	}
+
+	if *extra == true{
+		options.Extra = *extra
 	}
 
 	result, err := domain.Analyze(options)
@@ -70,6 +76,7 @@ func PrintResult(result domain.Result) {
 	for k, v := range result.Duplicate {
 		fmt.Printf("\033[37mValue \033[0m\033[32m%.2f years\033[0m\033[37m is found \033[0m\033[93m%d \033[0m\033[37mtimes\033[0m\n", k, v)
 	}
+	fmt.Println("\n\nNumber of values above average:", result.Extra)
 }
 
 func PrintHelp() {
@@ -83,4 +90,5 @@ func PrintHelp() {
 	fmt.Println("  -count   Number of values (5..100)")
 	fmt.Println("  -country Name of the country")
 	fmt.Println("  -seed    Random generator seed (optional)")
+	fmt.Println("  -extra   Count values above average (optional)")
 }
