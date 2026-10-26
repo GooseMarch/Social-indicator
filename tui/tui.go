@@ -7,8 +7,7 @@ import (
 	"strings"
 
 	"lab2_bubble/domain"
-	"lab2_bubble/cli"
-
+	"lab2_bubble/htmlreport"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -120,6 +119,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			options := domain.Options{
 				Count:   count,
 				Country: country,
+				Mode: "online",
 			}
 
 			if m.seed {
@@ -131,11 +131,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				options.Seed = &seed
 			}
 
-			result, err := domain.Analyze(options)
-			if err != nil {
-				m.errar = err
+			dataset, errar := domain.OnlineGenerate(options)
+			if errar != nil{
+				m.errar = errar
 				return m, nil
 			}
+
+			result, errar := domain.Analyze(dataset.Values, dataset.Country, dataset.Time, dataset.Mode, dataset.Generator, dataset.Seed, dataset.Whatusing, dataset.SeedValue, dataset.Count, options.Extra)
+
+			if errar != nil{
+				m.errar = errar
+				return m, nil
+			}
+
+
+			html, errar := htmlreport.Generatehtml(result)
+			if errar != nil {
+				m.errar = errar
+				return m, nil
+			}
+			errar = os.WriteFile("report.html", []byte(html), 0604)
+			if errar != nil {
+				m.errar = errar
+				return m, nil
+			}
+
 
 			m.country = country
 			m.count = count
@@ -220,6 +240,6 @@ func Run() {
 	}
 
 	if m.submit && m.errar == nil {
-		cli.PrintResult(m.finalresult)
+		fmt.Println("\n your report successfuly ganerated in report.html")
 	}
 }	
