@@ -8,8 +8,6 @@
 
 # Test binary, built with `go test -c`
 *.test
-.json
-.html
 
 # Code coverage profiles and other test artifacts
 coverage.*
@@ -55,3 +53,5 @@ credentials.json
 reports/
 *.zip
 *.rar
+dataset.json
+report.html
