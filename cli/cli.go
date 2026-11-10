@@ -42,7 +42,8 @@ func AnalyzeCLI(args []string) {
 	mode := Flagset.String("mode", "online", "Choose a mode: online or offline")
 	save := Flagset.String("save", "", "Insert path to save JSON")
 	input := Flagset.String("input", "", "Insert path to input JSON (with offline mode)")
-	reportPath := Flagset.String("report","","Insert path to save html report")
+	reportPath := Flagset.String("report", "","Insert path to save html report")
+	reportCSV := Flagset.String("reportCSV", "", "Insert path to save CSV report")
 
 	err := Flagset.Parse(args)
 	if err != nil {
@@ -101,8 +102,8 @@ func AnalyzeCLI(args []string) {
 		dataset = data
 
 		if *save != "" {
-			if *save == *reportPath {
-				fmt.Println("Error: save and report cant have the same path")
+			if *save == *reportPath || *save == *reportCSV {
+				fmt.Println("Error: save , report and CSV cant have the same path")
 				os.Exit(3)
 			}
 			errar := filework.SaveDataset(*save, dataset); 
@@ -131,6 +132,18 @@ func AnalyzeCLI(args []string) {
 		dataset = data
 		dataset.Mode = "offline"
 	}
+	if *reportCSV != ""{
+		if *reportCSV == *reportPath || *reportCSV == *save{
+			fmt.Println("Error: save , report and CSV cant have the same path")
+			os.Exit(9)
+		}
+		errar := filework.SaveDatasetCSV(*reportCSV, dataset)
+		if errar != nil{
+			fmt.Printf("Error to save CSV: %v", errar)
+			os.Exit(10)
+		}
+	}
+
 	result, errar := domain.Analyze(dataset.Values, dataset.Country, dataset.Time, dataset.Mode, dataset.Generator, dataset.Seed, dataset.Whatusing, dataset.SeedValue, dataset.Count, *extra)
 	if errar != nil{
 		fmt.Printf("Error cant analyze data try again: %v", errar)

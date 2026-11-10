@@ -10,6 +10,7 @@ import (
 	"time"
 	"strings"
 	"lab2_bubble/domain"
+	"encoding/csv"
 )
 
 const maxfilesize = 1048576
@@ -45,7 +46,42 @@ func SaveDataset(path string, dataset domain.Dataset) error {
 	return nil
 }
 
+func SaveDatasetCSV(path string, dataset domain.Dataset) error {
+    directory := filepath.Dir(path)
+	if directory != "." && directory != "" {
+		_, errar := os.Stat(directory)
+		if os.IsNotExist(errar) {
+			return fmt.Errorf("directory does not exist: %s", directory)
+}
+	}
+	file, errar := os.OpenFile(path, os.O_CREATE| os.O_WRONLY|os.O_EXCL, 0604)
+	if errar != nil {
+		if os.IsExist(errar) {
+			return fmt.Errorf("file already exists: %s", path)
+		}
+		return fmt.Errorf("failed to create file: %v", errar)
+	}
+	defer file.Close()
 
+	write := csv.NewWriter(file)
+	defer write.Flush()
+
+	_ = write.Write([]string{"Country", dataset.Country})
+	_ = write.Write([]string{"Count", fmt.Sprintf("%d", dataset.Count)})
+	_ = write.Write([]string{"Time", dataset.Time})
+	_ = write.Write([]string{"Generator", dataset.Generator})
+	_ = write.Write([]string{})
+
+	_ = write.Write([]string{"Index", "Value"})
+
+	for k, v := range dataset.Values {
+		errar := write.Write([]string{fmt.Sprintf("%d", k), fmt.Sprintf("%.1f", v)})
+		if errar != nil {
+			return fmt.Errorf("failed to write CSV: %v", errar)
+		}
+	}
+	return nil
+}
 func LoadDataset(path string) (domain.Dataset, error) {
 	file, errar := os.Open(path)
 	if errar != nil {
